@@ -18,6 +18,10 @@ app.get("/sightings", async (req, res) => {
   // console.log(req.query);
   const sightings = await getSightings();
 
+  for (let i = 0; i < sightings.length; i++) {
+    sightings[i].INDEX = i;
+  }
+
   // filter by year
   if (Object.keys(req.query).length !== 0) {
     const filteredSightings = sightings.filter((sight) => {
