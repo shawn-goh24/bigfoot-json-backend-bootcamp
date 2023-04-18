@@ -1,6 +1,6 @@
 const db = require("../db/models/index");
 
-const { Sighting } = db;
+const { Sighting, Comment } = db;
 
 async function getAll(req, res) {
   try {
@@ -53,4 +53,67 @@ async function editOne(req, res) {
   }
 }
 
-module.exports = { getAll, getOne, insertOne, editOne };
+async function getAllComment(req, res) {
+  const { sightingId } = req.params;
+  try {
+    const allComment = await Comment.findAll({
+      where: {
+        sightingId: sightingId,
+      },
+    });
+    return res.json(allComment);
+  } catch (err) {
+    return res.status(400).json({ error: true, message: err });
+  }
+}
+
+async function addComment(req, res) {
+  const { content } = req.body;
+  const { sightingId } = req.params;
+  try {
+    const newComment = await Comment.create({
+      updatedAt: new Date(),
+      createdAt: new Date(),
+      content: content,
+      sightingId: sightingId,
+    });
+    return res.json(newComment);
+  } catch (err) {
+    return res.status(400).json({ error: true, message: err });
+  }
+}
+
+async function deleteComment(req, res) {
+  try {
+    const { commentId } = req.params;
+    await Comment.destroy({ where: { id: commentId } });
+    let data = await Comment.findAll();
+    res.json({ data });
+  } catch (err) {
+    return res.status(400).json({ error: true, message: err });
+  }
+}
+
+async function editComment(req, res) {
+  try {
+    let commentToAdd = req.body;
+    let commentToReplace = req.params.commentId;
+    let commentToEdit = await Comment.findByPk(commentToReplace);
+    await commentToEdit.update(commentToAdd);
+    let allComment = await Comment.findAll();
+    res.json(allComment);
+  } catch (err) {
+    return res.status(400).json({ error: true, message: err });
+  }
+}
+
+module.exports = {
+  getAll,
+  getOne,
+  insertOne,
+  editOne,
+  getAllComment,
+  addComment,
+  deleteComment,
+  editComment,
+};

@@ -8,6 +8,7 @@ const process = require("process");
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../../config/database.js")[env];
 const initSighting = require("./sighting.js");
+const initComment = require("./comment.js");
 const db = {};
 
 let sequelize;
@@ -44,6 +45,11 @@ if (config.use_env_variable) {
 // });
 
 db.Sighting = initSighting(sequelize);
+db.Comment = initComment(sequelize);
+db.Sighting.hasMany(db.Comment, {
+  foreignKey: "sightingId",
+});
+db.Comment.belongsTo(db.Sighting);
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
